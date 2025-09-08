@@ -5,10 +5,8 @@ import { Wifi, Battery } from 'lucide-react';
 
 const StatusBar = () => {
   const [time, setTime] = useState('');
-  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
     const update = () => {
         setTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
     };
@@ -17,9 +15,22 @@ const StatusBar = () => {
     return () => clearInterval(timer);
   }, []);
 
+  if (!time) {
+    return (
+      <div className="w-full h-8 px-4 flex justify-between items-center text-sm font-semibold text-foreground">
+        <div>&nbsp;</div>
+        <div className="flex items-center gap-2">
+          <Wifi className="w-4 h-4" />
+          <Battery className="w-4 h-4" />
+          <span>100%</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full h-8 px-4 flex justify-between items-center text-sm font-semibold text-foreground">
-      <div>{isClient ? time : ''}</div>
+      <div>{time}</div>
       <div className="flex items-center gap-2">
         <Wifi className="w-4 h-4" />
         <Battery className="w-4 h-4" />
