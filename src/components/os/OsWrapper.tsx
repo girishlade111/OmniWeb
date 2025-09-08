@@ -16,8 +16,7 @@ const PHONE_HEIGHT = 812;
 const STATUS_BAR_HEIGHT = 32;
 const DOCK_HEIGHT = 80;
 const NAVIGATION_HEIGHT = 48;
-const APP_AREA_HEIGHT = PHONE_HEIGHT - STATUS_BAR_HEIGHT;
-
+const APP_AREA_HEIGHT = PHONE_HEIGHT - STATUS_BAR_HEIGHT - DOCK_HEIGHT - NAVIGATION_HEIGHT;
 
 const OsWrapper = () => {
   const [apps] = useState<App[]>(APPS);
@@ -30,16 +29,17 @@ const OsWrapper = () => {
   useEffect(() => {
     setIsMounted(true);
     let savedTheme: "light" | "dark" | null = null;
-    if (typeof window !== 'undefined') {
+    try {
       savedTheme = localStorage.getItem("omniweb-theme") as "light" | "dark" | null;
-    }
-    
-    if (savedTheme) {
-      setTheme(savedTheme);
-    } else if (typeof window !== 'undefined') {
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setTheme(prefersDark ? "dark" : "light");
-    } else {
+      
+      if (savedTheme) {
+        setTheme(savedTheme);
+      } else {
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        setTheme(prefersDark ? "dark" : "light");
+      }
+    } catch (e) {
+      // localStorage is not available
       setTheme("light");
     }
   }, []);
@@ -47,8 +47,10 @@ const OsWrapper = () => {
   const toggleTheme = useCallback(() => {
     setTheme(currentTheme => {
       const newTheme = currentTheme === "light" ? "dark" : "light";
-      if (typeof window !== 'undefined') {
+      try {
         localStorage.setItem("omniweb-theme", newTheme);
+      } catch (e) {
+        // localStorage is not available
       }
       return newTheme;
     });
@@ -83,7 +85,7 @@ const OsWrapper = () => {
     setNextZIndex(newZ + 1);
     setActiveAppId(appId);
 
-    const defaultSize = { width: PHONE_WIDTH, height: APP_AREA_HEIGHT - DOCK_HEIGHT - NAVIGATION_HEIGHT - STATUS_BAR_HEIGHT }; 
+    const defaultSize = { width: PHONE_WIDTH, height: APP_AREA_HEIGHT }; 
 
     setOpenApps(prev => [
       ...prev,
@@ -138,10 +140,10 @@ const OsWrapper = () => {
           <div className="relative z-10 flex flex-col h-full">
             <StatusBar />
             <div className="flex-grow relative" style={{ height: APP_AREA_HEIGHT }}>
-                {openApps.length === 0 && <HomeScreen />}
-                {openApps.map(app => (
-                    <Window key={app.id} openApp={app} />
-                ))}
+              <HomeScreen />
+              {openApps.map(app => (
+                <Window key={app.id} openApp={app} />
+              ))}
             </div>
             <Dock />
             <Navigation />

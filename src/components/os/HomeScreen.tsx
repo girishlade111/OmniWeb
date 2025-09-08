@@ -13,6 +13,9 @@ const HomeScreen = () => {
   // Filter out apps that are in the dock
   const homeScreenApps = APPS.filter(app => !DOCK_APPS.includes(app.id));
 
+  // Don't render homescreen if an app is open
+  if (os.openApps.length > 0) return null;
+
   return (
     <div className="h-full flex flex-col">
       <div className="p-4 pt-6">
