@@ -9,6 +9,7 @@ import HomeScreen from "./HomeScreen";
 import Dock from "./Dock";
 import Window from "./Window";
 import { cn } from "@/lib/utils";
+import Navigation from "./Navigation";
 
 const PHONE_WIDTH = 380;
 const PHONE_HEIGHT = 780;
@@ -21,20 +22,28 @@ const OsWrapper = () => {
   const [activeAppId, setActiveAppId] = useState<string | null>(null);
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("omniweb-theme") as "light" | "dark" | null;
+    let savedTheme: "light" | "dark" | null = null;
+    if (typeof window !== 'undefined') {
+      savedTheme = localStorage.getItem("omniweb-theme") as "light" | "dark" | null;
+    }
+    
     if (savedTheme) {
       setTheme(savedTheme);
-    } else {
+    } else if (typeof window !== 'undefined') {
       // If no theme is saved, check system preference
       const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       setTheme(prefersDark ? "dark" : "light");
+    } else {
+      setTheme("light");
     }
   }, []);
 
   const toggleTheme = useCallback(() => {
     setTheme(currentTheme => {
       const newTheme = currentTheme === "light" ? "dark" : "light";
-      localStorage.setItem("omniweb-theme", newTheme);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem("omniweb-theme", newTheme);
+      }
       return newTheme;
     });
   }, []);
@@ -68,7 +77,7 @@ const OsWrapper = () => {
     setNextZIndex(newZ + 1);
     setActiveAppId(appId);
 
-    const defaultSize = appToOpen.defaultSize || { width: 350, height: 400 };
+    const defaultSize = { width: PHONE_WIDTH, height: PHONE_HEIGHT - 60 }; // Full screen
 
     setOpenApps(prev => [
       ...prev,
@@ -76,7 +85,7 @@ const OsWrapper = () => {
         id: appId,
         zIndex: newZ,
         isMinimized: false,
-        position: { x: (PHONE_WIDTH - defaultSize.width) / 2, y: (PHONE_HEIGHT - 300 - defaultSize.height) / 2 },
+        position: { x: 0, y: 32 }, // Position below status bar
         size: defaultSize
       },
     ]);
@@ -88,6 +97,11 @@ const OsWrapper = () => {
       setActiveAppId(null);
     }
   }, [activeAppId]);
+  
+  const closeAllApps = useCallback(() => {
+    setOpenApps([]);
+    setActiveAppId(null);
+  }, []);
 
   const updateAppPosition = useCallback((appId: string, position: { x: number, y: number }) => {
     setOpenApps(prev =>
@@ -100,12 +114,13 @@ const OsWrapper = () => {
     openApps,
     openApp,
     closeApp,
+    closeAllApps,
     focusApp,
     updateAppPosition,
     theme,
     toggleTheme,
     activeAppId,
-  }), [apps, openApps, openApp, closeApp, focusApp, updateAppPosition, theme, toggleTheme, activeAppId]);
+  }), [apps, openApps, openApp, closeApp, closeAllApps, focusApp, updateAppPosition, theme, toggleTheme, activeAppId]);
 
   return (
     <OsContext.Provider value={contextValue}>
@@ -124,6 +139,7 @@ const OsWrapper = () => {
                 ))}
             </div>
             <Dock />
+            <Navigation />
           </div>
         </div>
       </div>

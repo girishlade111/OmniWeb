@@ -8,6 +8,7 @@ interface OsContextType {
   openApps: OpenApp[];
   openApp: (appId: string) => void;
   closeApp: (appId: string) => void;
+  closeAllApps: () => void;
   focusApp: (appId: string) => void;
   updateAppPosition: (appId: string, position: { x: number; y: number }) => void;
   theme: "light" | "dark";

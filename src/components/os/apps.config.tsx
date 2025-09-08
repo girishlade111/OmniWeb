@@ -23,15 +23,15 @@ import ContactsApp from "./apps/ContactsApp";
 import MusicApp from "./apps/MusicApp";
 
 export const APPS: App[] = [
-  { id: 'settings', name: 'Settings', Icon: Settings, component: SettingsApp, defaultSize: { width: 340, height: 500 } },
-  { id: 'browser', name: 'Browser', Icon: Globe, component: BrowserApp, defaultSize: { width: 360, height: 600 }, resizable: true },
-  { id: 'calendar', name: 'Calendar', Icon: Calendar, component: CalendarApp, defaultSize: { width: 320, height: 340 } },
-  { id: 'messages', name: 'Messages', Icon: MessageSquare, component: MessagesApp, defaultSize: { width: 340, height: 550 } },
-  { id: 'files', name: 'Files', Icon: Folder, component: FileExplorerApp, defaultSize: { width: 350, height: 400 } },
-  { id: 'gallery', name: 'Gallery', Icon: ImageIcon, component: GalleryApp, defaultSize: { width: 350, height: 500 } },
-  { id: 'clock', name: 'Clock', Icon: Clock, component: ClockApp, defaultSize: { width: 300, height: 200 } },
-  { id: 'contacts', name: 'Contacts', Icon: Contact, component: ContactsApp, defaultSize: { width: 340, height: 500 } },
-  { id: 'music', name: 'Music', Icon: Music, component: MusicApp, defaultSize: { width: 350, height: 580 } },
+  { id: 'settings', name: 'Settings', Icon: Settings, component: SettingsApp, resizable: false },
+  { id: 'browser', name: 'Browser', Icon: Globe, component: BrowserApp, resizable: false },
+  { id: 'calendar', name: 'Calendar', Icon: Calendar, component: CalendarApp, resizable: false },
+  { id: 'messages', name: 'Messages', Icon: MessageSquare, component: MessagesApp, resizable: false },
+  { id: 'files', name: 'Files', Icon: Folder, component: FileExplorerApp, resizable: false },
+  { id: 'gallery', name: 'Gallery', Icon: ImageIcon, component: GalleryApp, resizable: false },
+  { id: 'clock', name: 'Clock', Icon: Clock, component: ClockApp, resizable: false },
+  { id: 'contacts', name: 'Contacts', Icon: Contact, component: ContactsApp, resizable: false },
+  { id: 'music', name: 'Music', Icon: Music, component: MusicApp, resizable: false },
 ];
 
 export const DOCK_APPS = ['browser', 'messages', 'gallery', 'settings'];

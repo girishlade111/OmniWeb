@@ -23,7 +23,7 @@ const Window = ({ openApp }: WindowProps) => {
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging || !windowRef.current) return;
+      if (!isDragging || !windowRef.current || !app?.resizable) return;
       const dx = e.clientX - dragStartPos.current.x;
       const dy = e.clientY - dragStartPos.current.y;
       os?.updateAppPosition(openApp.id, {
@@ -45,14 +45,14 @@ const Window = ({ openApp }: WindowProps) => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, openApp.id, os]);
+  }, [isDragging, openApp.id, os, app?.resizable]);
 
 
   if (!os || !app) return null;
 
   const handleMouseDown = (e: ReactMouseEvent<HTMLDivElement>) => {
     // Only drag on header, not on buttons
-    if ((e.target as HTMLElement).closest('button')) return;
+    if ((e.target as HTMLElement).closest('button') || !app.resizable) return;
     
     os.focusApp(openApp.id);
     setIsDragging(true);
@@ -77,28 +77,30 @@ const Window = ({ openApp }: WindowProps) => {
       onMouseDown={() => os.focusApp(openApp.id)}
     >
       <Card className={cn(
-        "w-full h-full flex flex-col shadow-2xl overflow-hidden transition-all duration-300",
-        os.activeAppId === openApp.id ? 'border-primary/50 ring-2 ring-primary/50' : 'border-border'
+        "w-full h-full flex flex-col shadow-2xl overflow-hidden transition-all duration-300 border-0 rounded-none",
+        os.activeAppId === openApp.id ? 'ring-2 ring-primary/50' : ''
         )}>
-        <div 
-          className="h-8 bg-muted/80 flex items-center justify-between px-2 cursor-grab active:cursor-grabbing"
-          onMouseDown={handleMouseDown}
-        >
-          <div className="flex items-center gap-2">
-            <app.Icon className="w-4 h-4 text-foreground" />
-            <span className="text-xs font-semibold">{app.name}</span>
+        {app.resizable && (
+          <div 
+            className="h-8 bg-muted/80 flex items-center justify-between px-2 cursor-grab active:cursor-grabbing"
+            onMouseDown={handleMouseDown}
+          >
+            <div className="flex items-center gap-2">
+              <app.Icon className="w-4 h-4 text-foreground" />
+              <span className="text-xs font-semibold">{app.name}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <button className="h-5 w-5 rounded-full flex items-center justify-center hover:bg-white/20"><Minus className="w-3 h-3" /></button>
+              <button className="h-5 w-5 rounded-full flex items-center justify-center hover:bg-white/20"><Square className="w-3 h-3" /></button>
+              <button 
+                className="h-5 w-5 rounded-full flex items-center justify-center hover:bg-red-500"
+                onClick={() => os.closeApp(openApp.id)}
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <button className="h-5 w-5 rounded-full flex items-center justify-center hover:bg-white/20"><Minus className="w-3 h-3" /></button>
-            <button className="h-5 w-5 rounded-full flex items-center justify-center hover:bg-white/20"><Square className="w-3 h-3" /></button>
-            <button 
-              className="h-5 w-5 rounded-full flex items-center justify-center hover:bg-red-500"
-              onClick={() => os.closeApp(openApp.id)}
-            >
-              <X className="w-3 h-3" />
-            </button>
-          </div>
-        </div>
+        )}
         <div className="flex-grow overflow-auto">
           <AppContent />
         </div>
