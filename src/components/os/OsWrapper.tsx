@@ -24,6 +24,10 @@ const OsWrapper = () => {
     const savedTheme = localStorage.getItem("omniweb-theme") as "light" | "dark" | null;
     if (savedTheme) {
       setTheme(savedTheme);
+    } else {
+      // If no theme is saved, check system preference
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setTheme(prefersDark ? "dark" : "light");
     }
   }, []);
 
