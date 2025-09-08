@@ -11,8 +11,13 @@ import Window from "./Window";
 import { cn } from "@/lib/utils";
 import Navigation from "./Navigation";
 
-const PHONE_WIDTH = 380;
-const PHONE_HEIGHT = 780;
+const PHONE_WIDTH = 375;
+const PHONE_HEIGHT = 812;
+const STATUS_BAR_HEIGHT = 32;
+const DOCK_HEIGHT = 80;
+const NAVIGATION_HEIGHT = 48;
+const APP_AREA_HEIGHT = PHONE_HEIGHT - STATUS_BAR_HEIGHT - DOCK_HEIGHT - NAVIGATION_HEIGHT;
+
 
 const OsWrapper = () => {
   const [apps] = useState<App[]>(APPS);
@@ -30,7 +35,6 @@ const OsWrapper = () => {
     if (savedTheme) {
       setTheme(savedTheme);
     } else if (typeof window !== 'undefined') {
-      // If no theme is saved, check system preference
       const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       setTheme(prefersDark ? "dark" : "light");
     } else {
@@ -77,7 +81,7 @@ const OsWrapper = () => {
     setNextZIndex(newZ + 1);
     setActiveAppId(appId);
 
-    const defaultSize = { width: PHONE_WIDTH, height: PHONE_HEIGHT - 60 }; // Full screen
+    const defaultSize = { width: PHONE_WIDTH, height: APP_AREA_HEIGHT }; // Full screen app area
 
     setOpenApps(prev => [
       ...prev,
@@ -85,7 +89,7 @@ const OsWrapper = () => {
         id: appId,
         zIndex: newZ,
         isMinimized: false,
-        position: { x: 0, y: 32 }, // Position below status bar
+        position: { x: 0, y: 0 }, // Position relative to app area
         size: defaultSize
       },
     ]);
@@ -132,8 +136,8 @@ const OsWrapper = () => {
           <div className="absolute inset-0 bg-background/20 backdrop-blur-sm"></div>
           <div className="relative z-10 flex flex-col h-full">
             <StatusBar />
-            <div className="flex-grow relative">
-                <HomeScreen />
+            <div className="flex-grow relative" style={{ height: APP_AREA_HEIGHT }}>
+                {openApps.length === 0 && <HomeScreen />}
                 {openApps.map(app => (
                     <Window key={app.id} openApp={app} />
                 ))}
