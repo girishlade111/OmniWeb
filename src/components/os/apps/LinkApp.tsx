@@ -13,16 +13,16 @@ const LinkApp = ({ url }: LinkAppProps) => {
 
   useEffect(() => {
     if (os && url) {
-      // This component's purpose is to open the browser app with a specific URL
-      // and then close itself.
-      os.openApp('browser', { initialUrl: url });
-      // A slight delay to ensure the browser opens before this placeholder closes.
+      // Open the URL in a new browser tab
+      window.open(url, '_blank', 'noopener,noreferrer');
+      
+      // A slight delay to ensure the new tab is initiated before this placeholder closes.
       const timer = setTimeout(() => {
-        // Need to figure out its own app id to close.
-        // This is a bit of a hack, assumes the last opened app is this one.
-        const myApp = os.openApps[os.openApps.length-1];
-        if (myApp) {
-          os.closeApp(myApp.id);
+        // Find its own app instance to close.
+        // This assumes the last opened app is this one.
+        const myAppInstance = os.openApps[os.openApps.length-1];
+        if (myAppInstance) {
+          os.closeApp(myAppInstance.id);
         }
       }, 100);
       return () => clearTimeout(timer);
@@ -32,9 +32,11 @@ const LinkApp = ({ url }: LinkAppProps) => {
   return (
     <div className="w-full h-full flex items-center justify-center bg-card">
       <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      <span className="ml-2">Redirecting...</span>
+      <span className="ml-2">Opening...</span>
     </div>
   );
 };
+
+LinkApp.displayName = 'LinkApp';
 
 export default LinkApp;
