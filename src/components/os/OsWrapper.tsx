@@ -16,7 +16,7 @@ const PHONE_HEIGHT = 812;
 const STATUS_BAR_HEIGHT = 32;
 const DOCK_HEIGHT = 80;
 const NAVIGATION_HEIGHT = 48;
-const APP_AREA_HEIGHT = PHONE_HEIGHT - STATUS_BAR_HEIGHT - DOCK_HEIGHT - NAVIGATION_HEIGHT;
+const APP_AREA_HEIGHT = PHONE_HEIGHT - STATUS_BAR_HEIGHT;
 
 
 const OsWrapper = () => {
@@ -25,8 +25,10 @@ const OsWrapper = () => {
   const [nextZIndex, setNextZIndex] = useState(10);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [activeAppId, setActiveAppId] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     let savedTheme: "light" | "dark" | null = null;
     if (typeof window !== 'undefined') {
       savedTheme = localStorage.getItem("omniweb-theme") as "light" | "dark" | null;
@@ -81,7 +83,7 @@ const OsWrapper = () => {
     setNextZIndex(newZ + 1);
     setActiveAppId(appId);
 
-    const defaultSize = { width: PHONE_WIDTH, height: APP_AREA_HEIGHT }; // Full screen app area
+    const defaultSize = { width: PHONE_WIDTH, height: APP_AREA_HEIGHT - DOCK_HEIGHT - NAVIGATION_HEIGHT - STATUS_BAR_HEIGHT }; 
 
     setOpenApps(prev => [
       ...prev,
@@ -89,7 +91,7 @@ const OsWrapper = () => {
         id: appId,
         zIndex: newZ,
         isMinimized: false,
-        position: { x: 0, y: 0 }, // Position relative to app area
+        position: { x: 0, y: 0 }, 
         size: defaultSize
       },
     ]);
@@ -125,9 +127,8 @@ const OsWrapper = () => {
     toggleTheme,
     activeAppId,
   }), [apps, openApps, openApp, closeApp, closeAllApps, focusApp, updateAppPosition, theme, toggleTheme, activeAppId]);
-
-  return (
-    <OsContext.Provider value={contextValue}>
+  
+  const body = (
       <div className={cn("bg-neutral-800 p-2 sm:p-4 rounded-[2.5rem] shadow-2xl transition-colors", theme)}>
         <div 
           className="w-[375px] h-[812px] bg-cover bg-center rounded-[2rem] overflow-hidden relative flex flex-col transition-colors border-8 border-black"
@@ -147,6 +148,11 @@ const OsWrapper = () => {
           </div>
         </div>
       </div>
+  );
+
+  return (
+    <OsContext.Provider value={contextValue}>
+      {isMounted ? body : null}
     </OsContext.Provider>
   );
 };

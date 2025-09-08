@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Wifi, Battery } from 'lucide-react';
 
 const StatusBar = () => {
-  const [time, setTime] = useState('');
+  const [time, setTime] = useState<string | null>(null);
 
   useEffect(() => {
     const update = () => {
@@ -15,22 +15,9 @@ const StatusBar = () => {
     return () => clearInterval(timer);
   }, []);
 
-  if (!time) {
-    return (
-      <div className="w-full h-8 px-4 flex justify-between items-center text-sm font-semibold text-foreground">
-        <div>&nbsp;</div>
-        <div className="flex items-center gap-2">
-          <Wifi className="w-4 h-4" />
-          <Battery className="w-4 h-4" />
-          <span>100%</span>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="w-full h-8 px-4 flex justify-between items-center text-sm font-semibold text-foreground">
-      <div>{time}</div>
+      <div>{time || '--:--'}</div>
       <div className="flex items-center gap-2">
         <Wifi className="w-4 h-4" />
         <Battery className="w-4 h-4" />
