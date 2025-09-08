@@ -5,8 +5,10 @@ import { Wifi, Battery } from 'lucide-react';
 
 const StatusBar = () => {
   const [time, setTime] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     const update = () => {
         setTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
     };
@@ -17,7 +19,7 @@ const StatusBar = () => {
 
   return (
     <div className="w-full h-8 px-4 flex justify-between items-center text-sm font-semibold text-foreground">
-      <div>{time || '--:--'}</div>
+      <div>{isMounted ? time : '--:--'}</div>
       <div className="flex items-center gap-2">
         <Wifi className="w-4 h-4" />
         <Battery className="w-4 h-4" />

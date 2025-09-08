@@ -28,9 +28,16 @@ const OsWrapper = () => {
 
   useEffect(() => {
     setIsMounted(true);
-    let savedTheme: "light" | "dark" | null = null;
-    try {
-      savedTheme = localStorage.getItem("omniweb-theme") as "light" | "dark" | null;
+  }, []);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      let savedTheme: "light" | "dark" | null = null;
+      try {
+        savedTheme = localStorage.getItem("omniweb-theme") as "light" | "dark" | null;
+      } catch (e) {
+        // Silently fail if localStorage is not available
+      }
       
       if (savedTheme) {
         setTheme(savedTheme);
@@ -38,9 +45,6 @@ const OsWrapper = () => {
         const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
         setTheme(prefersDark ? "dark" : "light");
       }
-    } catch (e) {
-      // localStorage is not available
-      setTheme("light");
     }
   }, []);
 
@@ -50,7 +54,7 @@ const OsWrapper = () => {
       try {
         localStorage.setItem("omniweb-theme", newTheme);
       } catch (e) {
-        // localStorage is not available
+        // Silently fail if localStorage is not available
       }
       return newTheme;
     });
@@ -152,9 +156,14 @@ const OsWrapper = () => {
       </div>
   );
 
+  // Render a placeholder on the server and initial client render, then the full UI.
+  if (!isMounted) {
+    return null;
+  }
+
   return (
     <OsContext.Provider value={contextValue}>
-      {isMounted ? body : null}
+      {body}
     </OsContext.Provider>
   );
 };
