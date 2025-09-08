@@ -152,7 +152,7 @@ const OsWrapper = () => {
       <div className={cn("bg-neutral-800 p-2 sm:p-4 rounded-[2.5rem] shadow-2xl transition-colors", theme)}>
         <div 
           className="w-[375px] h-[812px] bg-cover bg-center rounded-[2rem] overflow-hidden relative flex flex-col transition-colors border-8 border-black"
-          style={{ backgroundImage: theme === 'light' ? 'url(/wallpapers/light.jpg)' : 'url(/wallpapers/dark.jpg)' }}
+          style={{ backgroundImage: `url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj-KraXm1UKi_9SRACIP9tvGkCuQRYEjJbfwgAAGIn__CtzvhsEKn9Kz9Rv8dWctUxblndqoPlQCHNvK30yS5In1hDKUdnknYrLGKa7M1tTUchpmzGaDTM7k9nc-BsKPuxFBVzJjYBrJps1B76rHL72tvYnlk2xzltlnV81zcZxajDbzDwyhyruF8BdATZ_/s1152/Gemini_Generated_Image_yaki32yaki32yaki.png')` }}
         >
           <div className="absolute inset-0 bg-background/20 backdrop-blur-sm"></div>
           <div className="relative z-10 flex flex-col h-full">
