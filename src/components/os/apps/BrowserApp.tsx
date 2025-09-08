@@ -1,18 +1,29 @@
 "use client";
-import { useState, useRef, KeyboardEvent } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, RefreshCw, Home, Search } from 'lucide-react';
 
-const BrowserApp = () => {
-  const [url, setUrl] = useState('https://duckduckgo.com/');
-  const [inputValue, setInputValue] = useState("https://duckduckgo.com/");
+interface BrowserAppProps {
+  initialUrl?: string;
+}
+
+const BrowserApp = ({ initialUrl }: BrowserAppProps) => {
+  const [url, setUrl] = useState(initialUrl || 'https://duckduckgo.com/');
+  const [inputValue, setInputValue] = useState(url);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  
+  useEffect(() => {
+    if (initialUrl) {
+      setUrl(initialUrl);
+      setInputValue(initialUrl);
+    }
+  }, [initialUrl]);
 
   const handleNavigation = (e: React.FormEvent) => {
     e.preventDefault();
     let newUrl = inputValue;
-    if (!/^(https?:\/\/)/.test(newUrl)) {
+    if (!/^(https?:\/\/|mailto:)/.test(newUrl)) {
       newUrl = `https://duckduckgo.com/?q=${encodeURIComponent(newUrl)}`;
     }
     setUrl(newUrl);

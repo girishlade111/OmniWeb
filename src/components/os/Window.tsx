@@ -60,7 +60,7 @@ const Window = ({ openApp }: WindowProps) => {
     windowStartPos.current = { x: openApp.position.x, y: openApp.position.y };
   };
 
-  const { component: AppContent } = app;
+  const { component: AppContent, props: appProps } = app;
   
   return (
     <div
@@ -102,7 +102,7 @@ const Window = ({ openApp }: WindowProps) => {
           </div>
         )}
         <div className="flex-grow overflow-auto">
-          <AppContent />
+          <AppContent {...appProps} {...openApp.props} />
         </div>
       </Card>
     </div>

@@ -16,7 +16,7 @@ const PHONE_HEIGHT = 812;
 const STATUS_BAR_HEIGHT = 32;
 const DOCK_HEIGHT = 80;
 const NAVIGATION_HEIGHT = 48;
-const APP_AREA_HEIGHT = PHONE_HEIGHT - STATUS_BAR_HEIGHT - DOCK_HEIGHT - NAVIGATION_HEIGHT;
+const APP_AREA_HEIGHT = PHONE_HEIGHT - STATUS_BAR_HEIGHT;
 
 const OsWrapper = () => {
   const [apps] = useState<App[]>(APPS);
@@ -75,49 +75,63 @@ const OsWrapper = () => {
     });
   }, [activeAppId, nextZIndex]);
 
-  const openApp = useCallback((appId: string) => {
+  const openApp = useCallback((appId: string, props: Record<string, any> = {}) => {
     const appToOpen = apps.find(a => a.id === appId);
     if (!appToOpen) return;
 
     const isAlreadyOpen = openApps.some(a => a.id === appId);
-    if (isAlreadyOpen) {
+    
+    // For link apps, we don't care if it's already open, we want to open the browser
+    if (isAlreadyOpen && appToOpen.component.displayName !== 'LinkApp') {
       focusApp(appId);
       return;
     }
     
     const newZ = nextZIndex;
     setNextZIndex(newZ + 1);
-    setActiveAppId(appId);
+    
+    // We create a unique ID for each app instance to handle multiple windows of the same app
+    const instanceId = `${appId}-${Date.now()}`;
+    setActiveAppId(instanceId);
 
-    const defaultSize = { width: PHONE_WIDTH, height: APP_AREA_HEIGHT }; 
+    const defaultSize = { width: PHONE_WIDTH, height: APP_AREA_HEIGHT - DOCK_HEIGHT - NAVIGATION_HEIGHT};
 
     setOpenApps(prev => [
       ...prev,
       {
-        id: appId,
+        id: instanceId, // Use instanceId here
+        appId: appId,
         zIndex: newZ,
         isMinimized: false,
         position: { x: 0, y: 0 }, 
-        size: defaultSize
+        size: defaultSize,
+        props: props
       },
     ]);
   }, [apps, openApps, nextZIndex, focusApp]);
 
-  const closeApp = useCallback((appId: string) => {
-    setOpenApps(prev => prev.filter(a => a.id !== appId));
-    if (activeAppId === appId) {
-      setActiveAppId(null);
+  const closeApp = useCallback((instanceId: string) => {
+    setOpenApps(prev => prev.filter(a => a.id !== instanceId));
+    if (activeAppId === instanceId) {
+       const remainingApps = openApps.filter(a => a.id !== instanceId);
+       if (remainingApps.length > 0) {
+         // Focus the top-most app
+         const topApp = remainingApps.reduce((prev, current) => (prev.zIndex > current.zIndex) ? prev : current);
+         setActiveAppId(topApp.id);
+       } else {
+         setActiveAppId(null);
+       }
     }
-  }, [activeAppId]);
+  }, [activeAppId, openApps]);
   
   const closeAllApps = useCallback(() => {
     setOpenApps([]);
     setActiveAppId(null);
   }, []);
 
-  const updateAppPosition = useCallback((appId: string, position: { x: number, y: number }) => {
+  const updateAppPosition = useCallback((instanceId: string, position: { x: number, y: number }) => {
     setOpenApps(prev =>
-      prev.map(app => (app.id === appId ? { ...app, position } : app))
+      prev.map(app => (app.id === instanceId ? { ...app, position } : app))
     );
   }, []);
 
@@ -144,13 +158,17 @@ const OsWrapper = () => {
           <div className="relative z-10 flex flex-col h-full">
             <StatusBar />
             <div className="flex-grow relative" style={{ height: APP_AREA_HEIGHT }}>
-              <HomeScreen />
-              {openApps.map(app => (
-                <Window key={app.id} openApp={app} />
-              ))}
+              <div className="absolute inset-0 h-full w-full" style={{height: `calc(100% - ${DOCK_HEIGHT + NAVIGATION_HEIGHT}px)`}}>
+                <HomeScreen />
+                {openApps.map(app => (
+                  <Window key={app.id} openApp={app} />
+                ))}
+              </div>
+              <div className="absolute bottom-0 left-0 right-0">
+                <Dock />
+                <Navigation />
+              </div>
             </div>
-            <Dock />
-            <Navigation />
           </div>
         </div>
       </div>
@@ -158,7 +176,12 @@ const OsWrapper = () => {
 
   // Render a placeholder on the server and initial client render, then the full UI.
   if (!isMounted) {
-    return null;
+    return (
+       <div className={cn("bg-neutral-800 p-2 sm:p-4 rounded-[2.5rem] shadow-2xl transition-colors", theme)}>
+        <div className="w-[375px] h-[812px] bg-cover bg-center rounded-[2rem] overflow-hidden relative flex flex-col transition-colors border-8 border-black">
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -6,7 +6,7 @@ import { createContext } from "react";
 interface OsContextType {
   apps: App[];
   openApps: OpenApp[];
-  openApp: (appId: string) => void;
+  openApp: (appId: string, props?: Record<string, any>) => void;
   closeApp: (appId: string) => void;
   closeAllApps: () => void;
   focusApp: (appId: string) => void;

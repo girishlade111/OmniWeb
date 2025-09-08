@@ -29,6 +29,9 @@ import CalculatorApp from "./apps/CalculatorApp";
 import NotesApp from "./apps/NotesApp";
 import WeatherApp from "./apps/WeatherApp";
 import TerminalApp from "./apps/TerminalApp";
+import LinkApp from "./apps/LinkApp";
+
+import { InstagramIcon, LinkedinIcon, GithubIcon, CodepenIcon, MailIcon } from './apps/SocialIcons';
 
 
 export const APPS: App[] = [
@@ -45,6 +48,11 @@ export const APPS: App[] = [
   { id: 'notes', name: 'Notes', Icon: PenSquare, component: NotesApp, resizable: false },
   { id: 'weather', name: 'Weather', Icon: CloudSun, component: WeatherApp, resizable: false },
   { id: 'terminal', name: 'Terminal', Icon: Terminal, component: TerminalApp, resizable: false },
+  { id: 'instagram', name: 'Instagram', Icon: InstagramIcon, component: LinkApp, resizable: false, props: { url: 'https://www.instagram.com/girish_lade_/' } },
+  { id: 'linkedin', name: 'LinkedIn', Icon: LinkedinIcon, component: LinkApp, resizable: false, props: { url: 'https://www.linkedin.com/in/girish-lade-075bba201/' } },
+  { id: 'github', name: 'GitHub', Icon: GithubIcon, component: LinkApp, resizable: false, props: { url: 'https://github.com/girishlade111' } },
+  { id: 'codepen', name: 'Codepen', Icon: CodepenIcon, component: LinkApp, resizable: false, props: { url: 'https://codepen.io/Girish-Lade-the-looper' } },
+  { id: 'mail', name: 'Mail', Icon: MailIcon, component: LinkApp, resizable: false, props: { url: 'mailto:girishlade111@gmail.com' } },
 ];
 
 export const DOCK_APPS = ['browser', 'messages', 'gallery', 'settings'];
